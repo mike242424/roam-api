@@ -55,7 +55,12 @@ export const registerUser = async (
 
 // Controller function for user login
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
-  const { username, password } = req.body;
+  const { username, password, confirmPassword } = req.body;
+
+  if (password !== confirmPassword) {
+    handleErrors(res, 400, 'Passwords do not match');
+    return;
+  }
 
   try {
     // Find the user by their email
