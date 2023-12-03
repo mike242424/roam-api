@@ -32,7 +32,7 @@ const router = express.Router();
  *               password:
  *                 type: string
  *               confirmPassword:
- *                type: string
+ *                 type: string
  *             required:
  *               - username
  *               - email
@@ -85,7 +85,7 @@ router.post('/register', registerUser);
  *               token: 'jwtToken123'
  *       '400':
  *         description: Passwords Do Not Match
- *        '401':
+ *       '401':
  *         description: Invalid Username Or Password
  *       '500':
  *         description: Internal Server Error
