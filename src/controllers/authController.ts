@@ -15,7 +15,7 @@ export const registerUser = async (
   try {
     // Check if the password and confirm password match
     if (password !== confirmPassword) {
-      handleErrors(res, 400, 'Passwords do not match');
+      handleErrors(res, 400, 'Passwords Do Not Match');
       return;
     }
 
@@ -58,7 +58,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
   const { username, password, confirmPassword } = req.body;
 
   if (password !== confirmPassword) {
-    handleErrors(res, 400, 'Passwords do not match');
+    handleErrors(res, 400, 'Passwords Do Not Match');
     return;
   }
 
@@ -68,7 +68,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
     // Check if the user exists
     if (!user) {
-      handleErrors(res, 401, 'Invalid username or password');
+      handleErrors(res, 401, 'Invalid Username Or Password');
       return;
     }
 
@@ -76,7 +76,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      handleErrors(res, 401, 'Invalid username or password');
+      handleErrors(res, 401, 'Invalid Username Or Password');
       return;
     }
 

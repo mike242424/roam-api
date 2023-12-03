@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
+import { specs } from '../docs/swaggerOptions';
 import authRoutes from './routes/authRoutes';
 
 dotenv.config();
@@ -26,6 +28,9 @@ app.use(cors());
 
 // Routes
 app.use('/api/auth', authRoutes);
+
+// Serve Swagger UI at /api-docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Start the server
 app.listen(PORT, () => {
