@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { UserModel } from '../models/userModel';
 import { hashPassword } from '../utils/bcryptUtils';
 import { generateToken } from '../utils/jwtUtils';
+import { handleErrors } from '../utils/errorUtils';
 import bcrypt from 'bcrypt';
 
 // Controller function for user registration
@@ -14,7 +15,7 @@ export const registerUser = async (
   try {
     // Check if the password and confirm password match
     if (password !== confirmPassword) {
-      res.status(400).json({ message: 'Passwords do not match' });
+      handleErrors(res, 400, 'Passwords do not match');
       return;
     }
 
@@ -41,14 +42,14 @@ export const registerUser = async (
     res.status(201).json({ user: sanitizedUser, token });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    handleErrors(res, 500, 'Internal Server Error');
   }
 
   // Handle JWT sign error
   if (Error.name === 'JsonWebTokenError') {
-    res.status(500).json({ message: 'Error signing the token' });
+    handleErrors(res, 500, 'Error signing the token');
   } else {
-    res.status(500).send('Internal Server Error');
+    handleErrors(res, 500, 'Internal Server Error');
   }
 };
 
@@ -62,7 +63,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
     // Check if the user exists
     if (!user) {
-      res.status(401).json({ message: 'Invalid email or password' });
+      handleErrors(res, 401, 'Invalid username or password');
       return;
     }
 
@@ -70,7 +71,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      res.status(401).json({ message: 'Invalid email or password' });
+      handleErrors(res, 401, 'Invalid username or password');
       return;
     }
 
@@ -88,6 +89,6 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({ user: sanitizedUser, token });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    handleErrors(res, 500, 'Internal Server Error');
   }
 };
