@@ -1,48 +1,52 @@
-import { Response, Request, NextFunction } from 'express';
-import jwt, { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken';
-import { UserModel } from '../models/userModel';
+import { Response, NextFunction } from 'express';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import RequestWithUser from 'types/requestWithUser';
+import UserModel from '../models/userModel';
+import dotenv from 'dotenv';
+import handleErrors from '../utils/errorUtils';
 
-const checkAuth = async (req: Request, res: Response, next: NextFunction) => {
+dotenv.config();
+
+interface MyJwtPayload extends JwtPayload {
+  _id: string;
+}
+
+// Secret key used to sign and verify JWTs
+const JWT_SECRET = process.env.JWT_SECRET;
+
+export const checkAuth = async (
+  req: RequestWithUser,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> => {
   try {
-    const tokenHeader = req.headers.authorization;
+    const token = req.headers.authorization.split(' ')[1];
 
-    if (!tokenHeader || !tokenHeader.startsWith('Bearer ')) {
-      return res
-        .status(401)
-        .json({ message: 'Invalid or missing token format' });
+    if (!token) {
+      return res.status(401).json({ message: 'Access Denied' });
     }
 
-    const token = tokenHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    let id: string;
+    const decoded = jwt.verify(token, JWT_SECRET) as MyJwtPayload;
 
-    if (typeof decoded === 'string') {
-      // If decoded is a string, it's the user ID
-      id = decoded;
-    } else {
-      // If decoded is an object, it's a JwtPayload
-      id = decoded.id;
-    }
+    const { _id } = decoded;
+    console.log('Decoded _id:', _id);
 
-    const user = await UserModel.findOne({ _id: id }).select('+role');
+    const user = await UserModel.findOne({ _id });
+    console.log('Retrieved User:', user);
 
     if (!user) {
-      return res.status(401).json({ message: 'Authorization Failed' });
+      res.status(401).json({ message: 'Authorization Failed' });
+    } else {
+      req.user = user;
+      next();
     }
-
-    req.userData = user;
-    return next();
-  } catch (err) {
-    if (err instanceof TokenExpiredError) {
-      return res.status(401).json({ message: 'Token has expired' });
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      handleErrors(res, 401, 'Token Has Expired');
+    } else if (error instanceof jwt.JsonWebTokenError) {
+      handleErrors(res, 401, 'Invalid Token');
+    } else {
+      handleErrors(res, 500, 'Internal Server Error');
     }
-
-    if (err instanceof JsonWebTokenError) {
-      return res.status(401).json({ message: 'Invalid token' });
-    }
-
-    return res.status(500).json({ message: (err as Error).message });
   }
 };
-
-export default checkAuth;

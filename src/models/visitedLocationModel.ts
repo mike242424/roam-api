@@ -1,26 +1,23 @@
-import mongoose, { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
+import { VisitedLocationInterface } from '../types/visitedLocationInterface';
 
-// Interface representing the document in MongoDB
-interface VisitedLocation extends Document {
-  city: string;
-  state: string;
-  country: string;
-  userId: mongoose.Types.ObjectId; // Reference to the user who visited
-}
-
-// Define the schema for the user visit model
-const visitedLocationSchema = new Schema<VisitedLocation>(
+// Define the schema for the VisitedLocation model
+const visitedLocationSchema = new Schema<VisitedLocationInterface>(
   {
-    city: { type: String, required: false },
-    state: { type: String, required: false },
-    country: { type: String, required: true },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    country: { type: String, required: true },
+    dateVisited: { type: Date, required: true },
+    // photos: { type: [String], required: true },
+    // notes: { type: String, required: false },
   },
-  { timestamps: true }, // Adds createdAt and updatedAt timestamps
+  // Adds createdAt and updatedAt timestamps
+  { timestamps: true },
 );
 
 // Create the VisitedLocation model
-const VisitedLocationModel = model<VisitedLocation>(
+const VisitedLocationModel = model<VisitedLocationInterface>(
   'VisitedLocation',
   visitedLocationSchema,
 );

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { UserModel } from '../models/userModel';
+import UserModel from '../models/userModel';
 import { hashPassword } from '../utils/bcryptUtils';
-import { generateToken } from '../utils/jwtUtils';
-import { handleErrors } from '../utils/errorUtils';
+import { generateJWTToken } from '../utils/jwtUtils';
+import handleErrors from '../utils/errorUtils';
 import bcrypt from 'bcrypt';
 
 // Controller function for user registration
@@ -13,6 +13,11 @@ export const registerUser = async (
   const { username, email, password, confirmPassword } = req.body;
 
   try {
+    if (!username || !email || !password) {
+      handleErrors(res, 400, 'Missing Required Fields');
+      return;
+    }
+
     // Check if the password and confirm password match
     if (password !== confirmPassword) {
       handleErrors(res, 400, 'Passwords Do Not Match');
@@ -26,10 +31,9 @@ export const registerUser = async (
       username,
       email,
       password: hashedPassword,
-      confirmPassword: hashedPassword,
     });
 
-    const token = generateToken(newUser._id);
+    const token = generateJWTToken(newUser._id);
 
     // Create a sanitized user object without password and confirmPassword
     const sanitizedUser = {
@@ -41,26 +45,18 @@ export const registerUser = async (
     // Return the created user and the token in the response
     res.status(201).json({ user: sanitizedUser, token });
   } catch (error) {
-    console.error(error);
-    handleErrors(res, 500, 'Internal Server Error');
-  }
-
-  // Handle JWT sign error
-  if (Error.name === 'JsonWebTokenError') {
-    handleErrors(res, 500, 'Error signing the token');
-  } else {
-    handleErrors(res, 500, 'Internal Server Error');
+    // Handle JWT sign error
+    if (Error.name === 'JsonWebTokenError') {
+      handleErrors(res, 500, 'Error Signing The Token');
+    } else {
+      handleErrors(res, 500, 'Internal Server Error');
+    }
   }
 };
 
 // Controller function for user login
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
-  const { username, password, confirmPassword } = req.body;
-
-  if (password !== confirmPassword) {
-    handleErrors(res, 400, 'Passwords Do Not Match');
-    return;
-  }
+  const { username, password } = req.body;
 
   try {
     // Find the user by their email
@@ -81,7 +77,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     }
 
     // If the password is correct, generate a JWT token
-    const token = generateToken(user._id);
+    const token = generateJWTToken(user._id);
 
     // Create a sanitized user object without password
     const sanitizedUser = {
@@ -93,7 +89,6 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     // Return the user and the token in the response
     res.status(200).json({ user: sanitizedUser, token });
   } catch (error) {
-    console.error(error);
     handleErrors(res, 500, 'Internal Server Error');
   }
 };

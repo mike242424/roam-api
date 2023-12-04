@@ -1,15 +1,14 @@
-import { Schema, model, Document } from 'mongoose';
-import { UserAttributes } from '../types/userAttributes';
+import { Schema, model } from 'mongoose';
+import UserInterface from '../types/userInterface';
 
-interface UserDocument extends UserAttributes, Document {}
-
-const UserSchema = new Schema({
+// Define the schema for the User model
+const UserSchema = new Schema<UserInterface>({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  confirmPassword: { type: String, required: true },
+  password: { type: String, required: true, select: false },
 });
 
-const UserModel = model<UserDocument>('User', UserSchema);
+// Create the User model
+const UserModel = model<UserInterface>('User', UserSchema);
 
-export { UserModel, UserAttributes, UserDocument };
+export default UserModel;

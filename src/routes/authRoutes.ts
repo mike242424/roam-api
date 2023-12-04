@@ -50,7 +50,7 @@ const router = express.Router();
  *       '500':
  *         description: Internal Server Error
  */
-router.post('/register', registerUser);
+router.route('/register').post(registerUser);
 
 /**
  * @swagger
@@ -90,6 +90,6 @@ router.post('/register', registerUser);
  *       '500':
  *         description: Internal Server Error
  */
-router.post('/login', loginUser);
+router.route('/login').post(loginUser);
 
 export default router;

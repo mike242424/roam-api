@@ -1,26 +1,19 @@
 import express from 'express';
-import mongoose from 'mongoose';
+import dbConnection from './db';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import { specs } from '../docs/swaggerOptions';
 import authRoutes from './routes/authRoutes';
+import visitedLocationRoutes from './routes/visitedLocationRoutes';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const MONGODB_URL = process.env.MONGODB_URL!;
 
-mongoose.connect(MONGODB_URL);
-
-const db = mongoose.connection;
-
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
-db.once('open', () => {
-  console.log('Connected to MongoDB');
-});
+// Connect to MongoDB
+dbConnection();
 
 // Middleware
 app.use(express.json());
@@ -28,6 +21,7 @@ app.use(cors());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/location', visitedLocationRoutes);
 
 // Serve Swagger UI at /api-docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
