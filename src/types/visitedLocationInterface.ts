@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 // Interface representing the document in MongoDB
-export interface VisitedLocationInterface extends Document {
+interface VisitedLocationInterface extends Document {
   userId: mongoose.Types.ObjectId; // Reference to the user who visited
   city: string;
   state: string;
@@ -10,3 +10,5 @@ export interface VisitedLocationInterface extends Document {
   // photos: string[];
   // notes?: string;
 }
+
+export default VisitedLocationInterface;

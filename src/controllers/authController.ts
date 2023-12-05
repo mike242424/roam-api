@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import UserModel from '../models/userModel';
-import { hashPassword } from '../utils/bcryptUtils';
-import { generateJWTToken } from '../utils/jwtUtils';
+import hashPassword from '../utils/bcryptUtils';
+import generateJWTToken from '../utils/jwtUtils';
 import handleErrors from '../utils/errorUtils';
 import bcrypt from 'bcrypt';
 

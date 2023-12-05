@@ -1,20 +1,17 @@
 import { Response, NextFunction } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import RequestWithUser from 'types/requestWithUser';
 import UserModel from '../models/userModel';
 import dotenv from 'dotenv';
 import handleErrors from '../utils/errorUtils';
+import MyJwtPayload from 'types/myJWTPayloadInterface';
 
 dotenv.config();
-
-interface MyJwtPayload extends JwtPayload {
-  _id: string;
-}
 
 // Secret key used to sign and verify JWTs
 const JWT_SECRET = process.env.JWT_SECRET;
 
-export const checkAuth = async (
+const checkAuthMiddleware = async (
   req: RequestWithUser,
   res: Response,
   next: NextFunction,
@@ -50,3 +47,5 @@ export const checkAuth = async (
     }
   }
 };
+
+export default checkAuthMiddleware;

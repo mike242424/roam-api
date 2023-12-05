@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const generateJWTToken = (userId: string): string => {
+const generateJWTToken = (userId: string): string => {
   const JWT_SECRET = process.env.JWT_SECRET;
 
   const token = jwt.sign({ _id: userId }, JWT_SECRET, {
@@ -12,3 +12,5 @@ export const generateJWTToken = (userId: string): string => {
 
   return token;
 };
+
+export default generateJWTToken;

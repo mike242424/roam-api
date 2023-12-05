@@ -1,5 +1,5 @@
-import { Schema, model, Document } from 'mongoose';
-import { VisitedLocationInterface } from '../types/visitedLocationInterface';
+import { Schema, model } from 'mongoose';
+import VisitedLocationInterface from '../types/visitedLocationInterface';
 
 // Define the schema for the VisitedLocation model
 const visitedLocationSchema = new Schema<VisitedLocationInterface>(
